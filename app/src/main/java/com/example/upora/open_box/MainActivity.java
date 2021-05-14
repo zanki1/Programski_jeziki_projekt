@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -83,20 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }).setNegativeButton("Yes open!", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                        // tuki pride predvajanje žetona
-                        //http://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID=000358&tokenFormat=2
-                        String url = "http://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID="+ id +"&tokenFormat=2";
-                        //Toast.makeText(this, url, Toast.LENGTH_LONG).show();
-                        /*
-                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                            }
-                        })*/
                         jsonParse();
-                        finish();
+                        //finish();
                     }
                 });
                 AlertDialog dialog=builder.create();
@@ -118,23 +107,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void jsonParse(){
-        String url = "http://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID="+ id +"&tokenFormat=2";
+        String url = "https://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID="+ id +"&tokenFormat=2";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                JsonReader jsonReader;
-                JSONObject jsonObject = new JSONObject();
+                String data = null;
                 try {
-                    String data = jsonObject.getString("Data");
-
+                    data = response.getString("Data");
+                    Log.i("response",data);
+                    
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                Log.i("Catch",error.toString());
             }
         });
 
