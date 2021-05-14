@@ -1,11 +1,15 @@
 package com.example.upora.open_box;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.VoiceInteractor;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.JsonReader;
@@ -28,6 +32,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Base64;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     public static final int ACTIVITY_ID = 123;
@@ -38,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public String[] splited;
     String id;
     private RequestQueue queue;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,13 +129,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void jsonParse(){
         String url = "https://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID="+ id +"&tokenFormat=2";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(JSONObject response) {
                 String data = null;
                 try {
                     data = response.getString("Data");
                     Log.i("response",data);
-                    
+                    byte[] decoded = Base64.getDecoder().decode(data);
+                    String newData = new String(decoded);
+                    Log.i("decoded", newData);
+                    //base64 teks unzipamo v token.wav
+                    //zapa treba mediaplayer za toti token.wav
+                    try
+                    {
+                        File file2 = new File("token.wav");
+                        file2.createNewFile(); //se naredi če še ne obstaja
+                        FileOutputStream os = new FileOutputStream(file2, true);
+                        os.write(decoded);
+                        os.close();
+                        Uri uri = Uri.fromFile(file2);
+                        //MediaPlayer mediaPlayer = MediaPlayer.create(this, uri);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -130,5 +170,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         queue.add(request);
+    }
+    public static boolean isZipped(final byte[] compressed) {
+        return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC))
+                && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
     }
 }
