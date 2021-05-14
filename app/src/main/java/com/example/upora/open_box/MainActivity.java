@@ -3,16 +3,29 @@ package com.example.upora.open_box;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.VoiceInteractor;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.JsonReader;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -23,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Vibrator vibrator;
     public String[] splited;
     String id;
+    private RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnScan = findViewById(R.id.btnOpenBox);
         btnScan.setOnClickListener(this);
+        queue = Volley.newRequestQueue(this);
     }
 
     @Override
@@ -70,7 +85,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onClick(DialogInterface dialog, int which) {
 
                         // tuki pride predvajanje žetona
-
+                        //http://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID=000358&tokenFormat=2
+                        String url = "http://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID="+ id +"&tokenFormat=2";
+                        //Toast.makeText(this, url, Toast.LENGTH_LONG).show();
+                        /*
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                            }
+                        })*/
+                        jsonParse();
                         finish();
                     }
                 });
@@ -90,5 +115,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         data.putExtra(String.valueOf(ACTIVITY_ID),message);
         setResult(RESULT_OK,data);
         finish();
+    }
+
+    private void jsonParse(){
+        String url = "http://api-test.direct4.me/Sandbox/PublicAccess/V1/api/access/OpenBox?boxID="+ id +"&tokenFormat=2";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JsonReader jsonReader;
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    String data = jsonObject.getString("Data");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        queue.add(request);
     }
 }
