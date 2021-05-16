@@ -7,10 +7,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.VoiceInteractor;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.os.Vibrator;
 import android.util.JsonReader;
 import android.util.Log;
@@ -36,9 +39,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Base64;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -137,26 +142,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     data = response.getString("Data");
                     Log.i("response",data);
                     byte[] decoded = Base64.getDecoder().decode(data);
+
                     String newData = new String(decoded);
+                    try (FileOutputStream fos = new FileOutputStream("data/data/com.example.upora.open_box/mndaZip.zip")) {
+                        fos.write(decoded);
+                        //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
+                    }
+
                     Log.i("decoded", newData);
                     //base64 teks unzipamo v token.wav
                     //zapa treba mediaplayer za toti token.wav
                     try
                     {
-                        File file2 = new File("token.wav");
+                        File file2 = new File("data/data/com.example.upora.open_box/token.wav");
                         file2.createNewFile(); //se naredi če še ne obstaja
-                        FileOutputStream os = new FileOutputStream(file2, true);
-                        os.write(decoded);
-                        os.close();
-                        Uri uri = Uri.fromFile(file2);
-                        //MediaPlayer mediaPlayer = MediaPlayer.create(this, uri);
+                        file2.setExecutable(true);
+                        FileOutputStream os = new FileOutputStream(file2, false);
+
+                        unzip("data/data/com.example.upora.open_box/mndaZip.zip","data/data/com.example.upora.open_box/unZiped");
+
+                        MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), Uri.parse("data/data/com.example.upora.open_box/unZiped/token.wav"));
+                        mediaPlayer.start();
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
 
-                } catch (JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
 
@@ -174,5 +187,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static boolean isZipped(final byte[] compressed) {
         return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC))
                 && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
+    }
+
+    public static Boolean unzip(String sourceFile, String destinationFolder)  {
+        ZipInputStream zis = null;
+
+        try {
+            zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
+            ZipEntry ze;
+            int count;
+            byte[] buffer = new byte[8192];
+            while ((ze = zis.getNextEntry()) != null) {
+                String fileName = ze.getName();
+                fileName = fileName.substring(fileName.indexOf("/") + 1);
+                File file = new File(destinationFolder, fileName);
+                File dir = ze.isDirectory() ? file : file.getParentFile();
+
+                if (!dir.isDirectory() && !dir.mkdirs())
+                    throw new FileNotFoundException("Invalid path: " + dir.getAbsolutePath());
+                if (ze.isDirectory()) continue;
+                FileOutputStream fout = new FileOutputStream(file);
+                try {
+                    while ((count = zis.read(buffer)) != -1)
+                        fout.write(buffer, 0, count);
+                } finally {
+                    fout.close();
+                }
+
+            }
+        } catch (IOException  ioe){
+            Log.d("TAG",ioe.getMessage());
+            return false;
+        }  finally {
+            if(zis!=null)
+                try {
+                    zis.close();
+                } catch(IOException e) {
+
+                }
+        }
+        return true;
     }
 }
