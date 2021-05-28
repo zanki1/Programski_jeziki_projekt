@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "815687863165",
+    "project_id": "open-box-2021",
+    "storage_bucket": "open-box-2021.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815687863165:android:ba3e96cff6c234a1c21a14",
+        "android_client_info": {
+          "package_name": "com.example.upora.open_box"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "815687863165-555n3vut4cv8esugrveu6bkmm00go7fi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqKiLA3tFjVSB3h52tLIGo7UuwVvk0PU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "815687863165-555n3vut4cv8esugrveu6bkmm00go7fi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
