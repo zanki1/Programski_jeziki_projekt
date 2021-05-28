@@ -4,12 +4,22 @@ import java.time.LocalDateTime;
 
 public class Box {
     private int boxID;
-    private LocalDateTime dateStamp;
+    private String dateStamp;
     private boolean opened;
     private float longitude;
     private float latitude;
 
-    public Box(int boxID, LocalDateTime dateStamp, boolean opened, float longitude, float latitude) {
+    /*public Box(){
+        this.boxID = 0;
+        this.dateStamp = null;
+        this.opened = false;
+        this.longitude = 0;
+        this.latitude = 0;
+    }*/
+    public Box(){
+    }
+
+    public Box(int boxID, String dateStamp, boolean opened, float longitude, float latitude) {
         this.boxID = boxID;
         this.dateStamp = dateStamp;
         this.opened = opened;
@@ -25,11 +35,11 @@ public class Box {
         this.boxID = boxID;
     }
 
-    public LocalDateTime getDateStamp() {
+    public String getDateStamp() {
         return dateStamp;
     }
 
-    public void setDateStamp(LocalDateTime dateStamp) {
+    public void setDateStamp(String dateStamp) {
         this.dateStamp = dateStamp;
     }
 
@@ -55,5 +65,16 @@ public class Box {
 
     public void setLatitude(float latitude) {
         this.latitude = latitude;
+    }
+
+    @Override
+    public String toString() {
+        return "Box{" +
+                "boxID=" + boxID +
+                ", dateStamp='" + dateStamp + '\'' +
+                ", opened=" + opened +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                '}';
     }
 }

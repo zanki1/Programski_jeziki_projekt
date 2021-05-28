@@ -28,6 +28,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.upora.data.Box;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -41,6 +44,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -51,6 +55,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
+
+import static java.lang.Integer.parseInt;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -64,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RequestQueue queue;
     private MediaPlayer mediaPlayer;
 
+    FirebaseDatabase rootNode;
+    DatabaseReference reference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnScan = findViewById(R.id.btnOpenBox);
         btnScan.setOnClickListener(this);
         queue = Volley.newRequestQueue(this);
+
+        rootNode = FirebaseDatabase.getInstance("https://open-box-2021-default-rtdb.europe-west1.firebasedatabase.app/");
+        reference = rootNode.getReference("box");
     }
 
     @Override
@@ -111,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onClick(DialogInterface dialog, int which) {
                         jsonParse();
                         //finish();
+
                     }
                 });
                 AlertDialog dialog=builder.create();
@@ -163,6 +176,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), Uri.parse("data/data/com.example.upora.open_box/unZiped/token.wav"));
                         mediaPlayer.start();
+
+                        AlertDialog.Builder builderBoxOpened = new AlertDialog.Builder(MainActivity.this);
+                        builderBoxOpened.setMessage(id);
+
+                        builderBoxOpened.setTitle("Ali se je nabiralnik odprl?");
+                        builderBoxOpened.setPositiveButton("DA!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Box tmp = new Box( parseInt(id), LocalDateTime.now().toString(),true,25,25);
+
+                                String id = String.valueOf(getRandomNumber(1,50));
+                                reference.child(id).setValue(tmp);
+
+                            }
+                        }).setNegativeButton("NE!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Box tmp = new Box( parseInt(id), LocalDateTime.now().toString(),false,25,25);
+
+                                String id = String.valueOf(getRandomNumber(1,50));
+                                reference.child(id).setValue(tmp);
+                            }
+                        });
+                        AlertDialog dialog2=builderBoxOpened.create();
+                        dialog2.show();
+
+
+                        //spodni del kode je potrebno še zrihtati
+                       /* AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage(id);
+
+                        builder.setTitle("Check location for box with id:");
+                        builder.setPositiveButton("No!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                scanCode();
+                            }
+                        }).setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent i = new Intent(getBaseContext(),LocationActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                                //startamo LocationActivity katera vsebuje mapo. Ta pridobi gps lokacijo telefona in označi z puščico na mapo trenutno lokacijo
+                                // startActivity(new Intent(MainActivity.this, LocationActivity.class));
+                            }
+                        });
+                        AlertDialog dialog2=builder.create();
+                        dialog2.show();*/
                     }
                     catch (Exception e)
                     {
@@ -184,6 +246,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         queue.add(request);
     }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
     public static boolean isZipped(final byte[] compressed) {
         return (compressed[0] == (byte) (GZIPInputStream.GZIP_MAGIC))
                 && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
@@ -227,5 +294,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         }
         return true;
+    }
+
+    public void showList(View view) {
+        Intent i = new Intent(getBaseContext(),ListOpened.class);
+        //i.putExtra(ActivityAddPlayer.FORM_MODE_ID,ActivityAddPlayer.FORM_MODE_INSERT);
+        startActivity(i);
     }
 }

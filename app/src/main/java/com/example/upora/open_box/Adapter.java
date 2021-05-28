@@ -1,6 +1,7 @@
 package com.example.upora.open_box;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.upora.data.Box;
@@ -42,7 +44,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             txtID = (TextView) itemView.findViewById(R.id.txtID);
             txtDateOpened = (TextView) itemView.findViewById(R.id.txtDateOpened);
             txtOpened = (TextView) itemView.findViewById(R.id.txtOpened);
-            iv = (ImageView) itemView.findViewById(R.id.icon);
+            iv = (ImageView) itemView.findViewById(R.id.rowicon);
             background = itemView.findViewById(R.id.myLayouthrow);
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -82,17 +84,22 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return viewHolder;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Box tmp = getPracticePosition(position);
         holder.txtID.setText("ID paketnika: " + tmp.getBoxID());
-        holder.txtDateOpened.setText("Datum odpiranja: " + String.valueOf(tmp.getDateStamp()));
+        holder.txtDateOpened.setText("Datum: " + String.valueOf(tmp.getDateStamp()));
 
         if(tmp.isOpened()){
             holder.txtOpened.setText("Uspešno odprt: DA");
+            holder.iv.setImageResource(R.drawable.ic_green);
+            //holder.iv.setImage(R.drawable.ic_green);
+
         }
         else{
             holder.txtOpened.setText("Uspešno odprt: NE");
+            holder.iv.setImageResource(R.drawable.ic_red);
         }
     }
 

@@ -12,7 +12,7 @@
         android:layout_margin="10dp"
         android:layout_height="wrap_content"
         android:contentDescription="TODO"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/ic_green"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
