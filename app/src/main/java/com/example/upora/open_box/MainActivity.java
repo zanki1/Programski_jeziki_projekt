@@ -28,7 +28,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -164,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), Uri.parse("data/data/com.example.upora.open_box/unZiped/token.wav"));
                         mediaPlayer.start();
-
                     }
                     catch (Exception e)
                     {
@@ -229,12 +227,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         }
         return true;
-    }
-
-
-    public void showList(View view) {
-        Intent i = new Intent(getBaseContext(),ListOpened.class);
-        //i.putExtra(ActivityAddPlayer.FORM_MODE_ID,ActivityAddPlayer.FORM_MODE_INSERT);
-        startActivity(i);
     }
 }
