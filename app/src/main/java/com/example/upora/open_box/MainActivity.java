@@ -163,6 +163,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), Uri.parse("data/data/com.example.upora.open_box/unZiped/token.wav"));
                         mediaPlayer.start();
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage(id);
+
+                        builder.setTitle("Check location for box with id:");
+                        builder.setPositiveButton("No!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                scanCode();
+                            }
+                        }).setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //startamo LocationActivity katera vsebuje mapo. Ta pridobi gps lokacijo telefona in označi z puščico na mapo trenutno lokacijo
+                                startActivity(new Intent(MainActivity.this, LocationActivity.class));
+                            }
+                        });
+                        AlertDialog dialog=builder.create();
+                        dialog.show();
                     }
                     catch (Exception e)
                     {
