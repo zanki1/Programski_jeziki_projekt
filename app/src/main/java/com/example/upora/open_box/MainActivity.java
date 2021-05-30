@@ -204,11 +204,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                         //spodni del kode je potrebno še zrihtati
-                       /* AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setMessage(id);
+                        AlertDialog.Builder builderLocation = new AlertDialog.Builder(MainActivity.this);
+                        builderLocation.setMessage(id);
 
-                        builder.setTitle("Check location for box with id:");
-                        builder.setPositiveButton("No!", new DialogInterface.OnClickListener() {
+                        builderLocation.setTitle("Check location for box with id:");
+                        builderLocation.setPositiveButton("No!", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 scanCode();
@@ -223,8 +223,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 // startActivity(new Intent(MainActivity.this, LocationActivity.class));
                             }
                         });
-                        AlertDialog dialog2=builder.create();
-                        dialog2.show();*/
+                        AlertDialog dialog3=builderLocation.create();
+                        dialog3.show();
                     }
                     catch (Exception e)
                     {
@@ -301,4 +301,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //i.putExtra(ActivityAddPlayer.FORM_MODE_ID,ActivityAddPlayer.FORM_MODE_INSERT);
         startActivity(i);
     }
+
+
 }

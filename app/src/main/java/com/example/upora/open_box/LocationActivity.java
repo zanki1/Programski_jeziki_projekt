@@ -150,13 +150,13 @@ public class LocationActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        map.onPause(); //needed for compass, my location overlays, v6.0.0 and up
+        map.onPause();
         Log.i(TAG,"onPause "+lok);
     }
 
     public void onResume(){
         super.onResume();
-        map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+        map.onResume();
     }
 
     private void getGPS(){
@@ -178,7 +178,7 @@ public class LocationActivity extends AppCompatActivity {
         }
         else {
             //permissions not granted
-
+            Toast.makeText(this, "Permissions not granted!", Toast.LENGTH_LONG).show();
         }
     }
 }
