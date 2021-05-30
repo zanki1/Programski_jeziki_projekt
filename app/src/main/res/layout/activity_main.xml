@@ -10,23 +10,37 @@
         android:id="@+id/btnOpenBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open the box"
+        android:text="Odpri nabiralnik"
         android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.217" />
 
     <Button
         android:id="@+id/btnOpenBoxList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show data"
-        android:textSize="24dp"
         android:onClick="showList"
+        android:text="Prikaži seznam"
+        android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnOpenBox" />
+        app:layout_constraintTop_toBottomOf="@+id/btnOpenBox"
+        app:layout_constraintVertical_bias="0.285" />
+
+    <Button
+        android:id="@+id/btnShowLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zemljevid nabiralnikov"
+        android:textSize="24dp"
+        android:onClick="openMaps"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnOpenBoxList" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

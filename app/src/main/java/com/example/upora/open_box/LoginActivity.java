@@ -92,4 +92,7 @@ public class LoginActivity extends AppCompatActivity {
             updateUI(null);
         }
     }
+
+    public void onClick(View view) {
+    }
 }

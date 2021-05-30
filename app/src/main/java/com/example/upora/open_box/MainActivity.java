@@ -3,19 +3,18 @@ package com.example.upora.open_box;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import android.app.VoiceInteractor;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
-import android.media.AudioAttributes;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.os.Vibrator;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,20 +25,20 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.upora.data.Box;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,12 +47,7 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 import static java.lang.Integer.parseInt;
@@ -72,6 +66,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     FirebaseDatabase rootNode;
     DatabaseReference reference;
+
+    FusedLocationProviderClient fusedLocationProviderClient;
+
+    float longiitude;
+    float latitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,34 +176,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), Uri.parse("data/data/com.example.upora.open_box/unZiped/token.wav"));
                         mediaPlayer.start();
 
+                        getGPS();
+
+                        //vpraša ali se je nabiralik odprl ali ne in shrani v bazo
                         AlertDialog.Builder builderBoxOpened = new AlertDialog.Builder(MainActivity.this);
                         builderBoxOpened.setMessage(id);
 
-                        builderBoxOpened.setTitle("Ali se je nabiralnik odprl?");
-                        builderBoxOpened.setPositiveButton("DA!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Box tmp = new Box( parseInt(id), LocalDateTime.now().toString(),true,25,25);
-
-                                String id = String.valueOf(getRandomNumber(1,50));
-                                reference.child(id).setValue(tmp);
-
-                            }
-                        }).setNegativeButton("NE!", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Box tmp = new Box( parseInt(id), LocalDateTime.now().toString(),false,25,25);
-
-                                String id = String.valueOf(getRandomNumber(1,50));
-                                reference.child(id).setValue(tmp);
-                            }
-                        });
-                        AlertDialog dialog2=builderBoxOpened.create();
-                        dialog2.show();
-
-
-                        //spodni del kode je potrebno še zrihtati
-                        AlertDialog.Builder builderLocation = new AlertDialog.Builder(MainActivity.this);
+                        /*AlertDialog.Builder builderLocation = new AlertDialog.Builder(MainActivity.this);
                         builderLocation.setMessage(id);
 
                         builderLocation.setTitle("Check location for box with id:");
@@ -224,7 +202,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         });
                         AlertDialog dialog3=builderLocation.create();
-                        dialog3.show();
+                        dialog3.show();*/
+
+                        builderBoxOpened.setTitle("Ali se je nabiralnik odprl?");
+                        builderBoxOpened.setPositiveButton("DA!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                Box tmp = new Box( parseInt(id), LocalDateTime.now().toString(),true,longiitude,latitude);
+                                String id = String.valueOf(getRandomNumber(1,50));
+                                reference.child(id).setValue(tmp);
+
+                            }
+                        }).setNegativeButton("NE!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Box tmp = new Box( parseInt(id), LocalDateTime.now().toString(),false,longiitude,latitude);
+
+                                String id = String.valueOf(getRandomNumber(1,50));
+                                reference.child(id).setValue(tmp);
+                            }
+                        });
+                        AlertDialog dialog2=builderBoxOpened.create();
+                        dialog2.show();
+
+
                     }
                     catch (Exception e)
                     {
@@ -302,5 +304,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(i);
     }
 
+    private void getGPS(){
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
 
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    longiitude = (float) location.getLongitude();
+                    latitude = (float) location.getLatitude();
+                }
+            });
+        }
+        else {
+            //permissions not granted
+            Toast.makeText(this, "Permissions not granted!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void openMaps(View view) {
+        Intent i = new Intent(getBaseContext(),LocationActivity.class);
+        //i.putExtra(ActivityAddPlayer.FORM_MODE_ID,ActivityAddPlayer.FORM_MODE_INSERT);
+        startActivity(i);
+    }
 }

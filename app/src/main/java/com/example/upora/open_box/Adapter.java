@@ -1,6 +1,7 @@
 package com.example.upora.open_box;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private OnItemClickListener listener;
 
     ArrayList<Box> listOfBoxes;
+
+    public int counter=0;
 
     public Adapter(ArrayList<Box> listOfBoxes, OnItemClickListener listener ) {
         this.listOfBoxes = listOfBoxes;
@@ -94,12 +97,21 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         if(tmp.isOpened()){
             holder.txtOpened.setText("Uspešno odprt: DA");
             holder.iv.setImageResource(R.drawable.ic_green);
+
             //holder.iv.setImage(R.drawable.ic_green);
 
         }
         else{
             holder.txtOpened.setText("Uspešno odprt: NE");
             holder.iv.setImageResource(R.drawable.ic_red);
+        }
+        if(counter==0){
+            holder.background.setBackgroundColor(Color.DKGRAY);
+            counter=1;
+        }
+        else{
+            //holder.background.setBackgroundColor(Color.DKGRAY);
+            counter=0;
         }
     }
 
